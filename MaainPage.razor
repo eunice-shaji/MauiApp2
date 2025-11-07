@@ -1,0 +1,34 @@
+﻿@page "/"
+@using MyApp.Models
+@using MyApp.Services
+@inject ApiService Api
+@inject PostRepository Repo
+
+<h3>Posts from API</h3>
+
+<button @onclick="FetchAndSaveData">Fetch & Save Data</button>
+
+@if (posts != null && posts.Count > 0)
+{
+    <ul>
+        @foreach (var p in posts)
+        {
+            <li>@p.title</li>
+        }
+    </ul>
+}
+else
+{
+    <p>No posts loaded yet.</p>
+}
+
+@code {
+    private List<Post> posts = new();
+
+    private async Task FetchAndSaveData()
+    {
+        var apiData = await Api.GetPostsAsync();
+        await Repo.InsertAllAsync(apiData);
+        posts = await Repo.GetAllAsync();
+    }
+}
